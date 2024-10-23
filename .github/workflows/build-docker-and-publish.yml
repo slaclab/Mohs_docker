@@ -34,11 +34,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set image name to lowercase
-        run: echo "IMAGE_NAME=${{ github.repository }}" | tr '[:upper:]' '[:lower:]' >> $GITHUB_ENV
+        run: echo "IMAGE_NAME=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:testing_base_bookworm-${{ github.sha }} -f ${{ env.DOCKERFILE }} .
+          docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:testing_base_bookworm-${{ github.sha }} -f ${{ env.DOCTORFILE }} .
           docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:testing_base_bookworm-${{ github.sha }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
       - name: Push Docker image
@@ -69,11 +69,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set image name to lowercase
-        run: echo "IMAGE_NAME=${{ github.repository }}" | tr '[:upper:]' '[:lower:]' >> $GITHUB_ENV
+        run: echo "IMAGE_NAME=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:ghdl-${{ github.sha }} -f ${{ env.DOCKERFILE }} .
+          docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:ghdl-${{ github.sha }} -f ${{ env.DOCTORFILE }} .
           docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:ghdl-${{ github.sha }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
       - name: Push Docker image
@@ -104,11 +104,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set image name to lowercase
-        run: echo "IMAGE_NAME=${{ github.repository }}" | tr '[:upper:]' '[:lower:]' >> $GITHUB_ENV
+        run: echo "IMAGE_NAME=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:litex_env_bookworm-${{ github.sha }} -f ${{ env.DOCKERFILE }} .
+          docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:litex_env_bookworm-${{ github.sha }} -f ${{ env.DOCTORFILE }} .
           docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:litex_env_bookworm-${{ github.sha }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
       - name: Push Docker image
@@ -139,14 +139,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set image name to lowercase
-        run: echo "IMAGE_NAME=${{ github.repository }}" | tr '[:upper:]' '[:lower:]' >> $GITHUB_ENV
+        run: echo "IMAGE_NAME=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:xilinx_env_bookworm-${{ github.sha }} -f ${{ env.DOCKERFILE }} .
-          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:xilinx_env_bookworm-${{ github.sha }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-
-      - name: Push Docker image
-        run: |
-          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:xilinx_env_bookworm-${{ github.sha }}
-          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:xilinx_env_bookworm-${{ github.sha }} -f ${{ env.DOCTORFILE }} .
+          docker tag ${{ env.REGISTRY
