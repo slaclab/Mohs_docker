@@ -37,7 +37,7 @@ RUN apt-get update && \
     python3 -c "import numpy; print('LRD Test %f' % numpy.pi)" && \
     pip3 --version
 # Note that flex, bison, and iverilog (above) required for building vhd2vl.
-# gcc-riscv64-unknown-elf above replace our previous
+#  gcc-riscv64-unknown-elf above replace our previous
 #   approach, used in Buster, of building from source
 
 # Allow pip to install packages
