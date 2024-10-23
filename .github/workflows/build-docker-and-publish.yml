@@ -15,7 +15,7 @@ jobs:
 
     env:
       REGISTRY: ghcr.io
-      IMAGE_NAME: ${{ github.repository }}  # Use repository name
+      IMAGE_NAME: ${{ github.repository | toLower }}  # Convert to lowercase Use repository name
       DOCKERFILE: Dockerfile.testing_base_bookworm
 
     steps:
