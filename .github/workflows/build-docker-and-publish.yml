@@ -43,8 +43,16 @@ jobs:
 
       - name: Push Docker image
         run: |
-          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:testing_base_bookworm-${{ github.sha }}  --public
-          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest  --public
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:testing_base_bookworm-${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Make package public
+        run: |
+          curl -X PATCH \
+            -H "Authorization: Bearer ${{ secrets.GHCR_PAT }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/orgs/YOUR_ORG/packages/container/slaclab%2Fmohs_docker/versions/latest \
+            -d '{"visibility":"public"}'
 
   build_ghdl:
     name: Build and Push Dockerfile.ghdl
@@ -78,8 +86,16 @@ jobs:
 
       - name: Push Docker image
         run: |
-          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:ghdl-${{ github.sha }} --public
-          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest --public
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:ghdl-${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Make package public
+        run: |
+          curl -X PATCH \
+            -H "Authorization: Bearer ${{ secrets.GHCR_PAT }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/orgs/YOUR_ORG/packages/container/slaclab%2Fmohs_docker/versions/latest \
+            -d '{"visibility":"public"}'
 
   build_litex_env_bookworm:
     name: Build and Push Dockerfile.litex_env_bookworm
@@ -113,8 +129,16 @@ jobs:
 
       - name: Push Docker image
         run: |
-          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:litex_env_bookworm-${{ github.sha }} --public
-          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest --public
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:litex_env_bookworm-${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Make package public
+        run: |
+          curl -X PATCH \
+            -H "Authorization: Bearer ${{ secrets.GHCR_PAT }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/orgs/YOUR_ORG/packages/container/slaclab%2Fmohs_docker/versions/latest \
+            -d '{"visibility":"public"}'
 
   build_xilinx_env_bookworm:
     name: Build and Push Dockerfile.xilinx_env_bookworm
@@ -148,5 +172,13 @@ jobs:
 
       - name: Push Docker image
         run: |
-          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:xilinx_env_bookworm-${{ github.sha }} --public
-          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest --public
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:xilinx_env_bookworm-${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Make package public
+        run: |
+          curl -X PATCH \
+            -H "Authorization: Bearer ${{ secrets.GHCR_PAT }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/orgs/YOUR_ORG/packages/container/slaclab%2Fmohs_docker/versions/latest \
+            -d '{"visibility":"public"}'
