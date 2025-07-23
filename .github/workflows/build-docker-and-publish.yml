@@ -38,12 +38,12 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:testing_base_bookworm-${{ github.sha }} -f ${{ env.DOCKERFILE }} .
-          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:testing_base_bookworm-${{ github.sha }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:testing_base_bookworm -f ${{ env.DOCKERFILE }} .
+          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:testing_base_bookworm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
       - name: Push Docker image
         run: |
-          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:testing_base_bookworm-${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:testing_base_bookworm
           docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
       - name: Make package public
@@ -81,12 +81,12 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:ghdl-${{ github.sha }} -f ${{ env.DOCKERFILE }} .
-          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:ghdl-${{ github.sha }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:ghdl -f ${{ env.DOCKERFILE }} .
+          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:ghdl ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
       - name: Push Docker image
         run: |
-          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:ghdl-${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:ghdl
           docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
       - name: Make package public
@@ -124,12 +124,12 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:litex_env_bookworm-${{ github.sha }} -f ${{ env.DOCKERFILE }} .
-          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:litex_env_bookworm-${{ github.sha }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:litex_env_bookworm -f ${{ env.DOCKERFILE }} .
+          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:litex_env_bookworm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
       - name: Push Docker image
         run: |
-          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:litex_env_bookworm-${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:litex_env_bookworm
           docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
       - name: Make package public
@@ -167,12 +167,12 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:xilinx_env_bookworm-${{ github.sha }} -f ${{ env.DOCKERFILE }} .
-          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:xilinx_env_bookworm-${{ github.sha }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:xilinx_env_bookworm -f ${{ env.DOCKERFILE }} .
+          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:xilinx_env_bookworm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
       - name: Push Docker image
         run: |
-          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:xilinx_env_bookworm-${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:xilinx_env_bookworm
           docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
       - name: Make package public
