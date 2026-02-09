@@ -51,7 +51,7 @@ jobs:
           curl -X PATCH \
             -H "Authorization: Bearer ${{ secrets.GHCR_PAT }}" \
             -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/orgs/YOUR_ORG/packages/container/slaclab%2Fmohs_docker/versions/latest \
+            https://api.github.com/orgs/slaclab/packages/container/slaclab%2Fmohs_docker/versions/latest \
             -d '{"visibility":"public"}'
 
   build_ghdl:
@@ -94,7 +94,7 @@ jobs:
           curl -X PATCH \
             -H "Authorization: Bearer ${{ secrets.GHCR_PAT }}" \
             -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/orgs/YOUR_ORG/packages/container/slaclab%2Fmohs_docker/versions/latest \
+            https://api.github.com/orgs/slaclab/packages/container/slaclab%2Fmohs_docker/versions/latest \
             -d '{"visibility":"public"}'
 
   build_litex_env_bookworm:
@@ -137,7 +137,7 @@ jobs:
           curl -X PATCH \
             -H "Authorization: Bearer ${{ secrets.GHCR_PAT }}" \
             -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/orgs/YOUR_ORG/packages/container/slaclab%2Fmohs_docker/versions/latest \
+            https://api.github.com/orgs/slaclab/packages/container/slaclab%2Fmohs_docker/versions/latest \
             -d '{"visibility":"public"}'
 
   build_xilinx_env_bookworm:
@@ -180,5 +180,5 @@ jobs:
           curl -X PATCH \
             -H "Authorization: Bearer ${{ secrets.GHCR_PAT }}" \
             -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/orgs/YOUR_ORG/packages/container/slaclab%2Fmohs_docker/versions/latest \
+            https://api.github.com/orgs/slaclab/packages/container/slaclab%2Fmohs_docker/versions/latest \
             -d '{"visibility":"public"}'
