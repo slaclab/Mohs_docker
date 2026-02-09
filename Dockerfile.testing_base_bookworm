@@ -114,3 +114,5 @@ RUN apt-get update && \
         libidn12 && \
     rm -rf /var/lib/apt/lists/* && \
     ln -s libidn.so.12 /usr/lib/x86_64-linux-gnu/libidn.so.11
+
+LABEL org.opencontainers.image.source=https://github.com/slaclab/Mohs_docker
