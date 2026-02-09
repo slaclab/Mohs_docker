@@ -47,14 +47,6 @@ jobs:
           docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:testing_base_bookworm
           docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:testing_latest
 
-      - name: Make package public
-        run: |
-          curl -X PATCH \
-            -H "Authorization: Bearer ${{ secrets.GHCR_PAT }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/orgs/slaclab/packages/container/slaclab%2Fmohs_docker/versions/latest \
-            -d '{"visibility":"public"}'
-
   build_ghdl:
     name: Build and Push Dockerfile.ghdl
     runs-on: ubuntu-latest
@@ -89,14 +81,6 @@ jobs:
         run: |
           docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:ghdl
           docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:ghdl_latest
-
-      - name: Make package public
-        run: |
-          curl -X PATCH \
-            -H "Authorization: Bearer ${{ secrets.GHCR_PAT }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/orgs/slaclab/packages/container/slaclab%2Fmohs_docker/versions/latest \
-            -d '{"visibility":"public"}'
 
   build_litex_env_bookworm:
     name: Build and Push Dockerfile.litex_env_bookworm
@@ -133,14 +117,6 @@ jobs:
           docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:litex_env_bookworm
           docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:litex_latest
 
-      - name: Make package public
-        run: |
-          curl -X PATCH \
-            -H "Authorization: Bearer ${{ secrets.GHCR_PAT }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/orgs/slaclab/packages/container/slaclab%2Fmohs_docker/versions/latest \
-            -d '{"visibility":"public"}'
-
   build_xilinx_env_bookworm:
     name: Build and Push Dockerfile.xilinx_env_bookworm
     runs-on: ubuntu-latest
@@ -175,11 +151,3 @@ jobs:
         run: |
           docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:xilinx_env_bookworm
           docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:xilinx_latest
-
-      - name: Make package public
-        run: |
-          curl -X PATCH \
-            -H "Authorization: Bearer ${{ secrets.GHCR_PAT }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/orgs/slaclab/packages/container/slaclab%2Fmohs_docker/versions/latest \
-            -d '{"visibility":"public"}'
