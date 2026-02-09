@@ -1,4 +1,12 @@
-FROM debian:buster-slim AS ghdl
+# Fixed the 'AS' casing to match 'FROM'
+FROM debian:bookworm AS base
 
-# GHDL
-RUN apt-get update && apt-get install -y ghdl ghdl-llvm ghdl-gcc ghdl-mcode
+# Prevent prompts during installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# In Debian Bookworm, the package is simply 'ghdl'
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ghdl \
+    ca-certificates \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
