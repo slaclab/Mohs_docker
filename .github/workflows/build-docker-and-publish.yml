@@ -5,6 +5,7 @@ on:
     branches:
       - main
     paths:
+      - '.github/workflows/build-docker-and-publish.yml'
       - 'Dockerfile.testing_base_bookworm'
       - 'Dockerfile.ghdl'
       - 'Dockerfile.litex_env_bookworm'
