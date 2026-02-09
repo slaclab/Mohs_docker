@@ -1,4 +1,4 @@
-FROM debian:buster-slim as ghdl
+FROM debian:buster-slim AS ghdl
 
 # GHDL
 RUN apt-get update && apt-get install -y ghdl ghdl-llvm ghdl-gcc ghdl-mcode
