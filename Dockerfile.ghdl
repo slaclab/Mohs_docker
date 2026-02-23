@@ -7,12 +7,22 @@ ENV DEBIAN_FRONTEND=noninteractive
 # In Debian Bookworm, the package is simply 'ghdl'
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ghdl \
-    ca-certificates \
+    make ca-certificates \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Cocotb and dependencies
 RUN apt-get update && apt-get install -y python3-pip python3-dev
-RUN pip3 install --break-system-packages cocotb cocotb-bus cocotb-test pytest
+RUN pip3 install --break-system-packages cocotb cocotb-bus cocotb-test pytest gcovr
+
+# --- Xilinx Library Integration ---
+# This assumes the 'ghdl_vendors' folder is in the same directory as the Dockerfile
+# during the 'docker build' command.
+RUN mkdir -p /usr/local/lib/ghdl/vendors/xilinx-vivado
+COPY ghdl_vendors/xilinx-vivado/ /usr/local/lib/ghdl/vendors/xilinx-vivado/
+RUN chmod -R 755 /usr/local/lib/ghdl/vendors/xilinx-vivado
+
+# Force GHDL to see the new library path
+ENV GHDL_FLAGS="-P/usr/local/lib/ghdl/vendors/xilinx-vivado"
 
 LABEL org.opencontainers.image.source=https://github.com/slaclab/Mohs_docker
