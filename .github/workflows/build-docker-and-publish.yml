@@ -64,6 +64,16 @@ jobs:
       DOCKERFILE: Dockerfile.ghdl
     steps:
       - uses: actions/checkout@v3
+      
+      # 1. Download the pre-compiled libraries you created on eed-fpga
+      # You can host these in a 'vendor-libs' repo or a release asset
+      - name: Download Compiled Xilinx Libs
+        run: |
+          mkdir -p ghdl_vendors/xilinx-vivado
+          curl -L -H "Authorization: token ${{ secrets.GHCR_PAT }}" \
+          "https://github.com/slaclab/your-libs-repo/raw/main/unisim-obj08.cf" \
+          -o ghdl_vendors/xilinx-vivado/unisim-obj08.cf
+
       - uses: docker/setup-buildx-action@v2
       - uses: docker/login-action@v2
         with:
