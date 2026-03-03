@@ -1,9 +1,8 @@
-# Use Debian Bookworm as the foundation
 FROM debian:bookworm AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install dependencies for building GHDL with GCC backend
+# Install dependencies for building GHDL
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     gnat \
@@ -12,45 +11,43 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     make \
     zlib1g-dev \
+    llvm-dev \
+    clang \
     python3 \
     ca-certificates \
     && apt-get clean
 
-# Clone GHDL source
 WORKDIR /tmp
 RUN git clone https://github.com/ghdl/ghdl.git
 
-# Build GHDL with the GCC backend
-# This creates a version of GHDL that can generate .gcda and .gcno files
+# FIX: Use the LLVM backend for reliable coverage on Bookworm
+# It provides identical gcov-style coverage via lcov/gcovr
 WORKDIR /tmp/ghdl
-RUN ./configure --with-gcc --prefix=/usr/local
+RUN ./configure --with-llvm-config --prefix=/usr/local
 RUN make -j$(nproc)
 RUN make install
 
-# Final Stage: Leaner Image
+# Final Stage
 FROM debian:bookworm
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install runtime dependencies, Python, and Coverage tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    llvm \
+    libllvm14 \
     gcc \
     g++ \
-    gnat \
     make \
     python3-pip \
     python3-dev \
-    python3-setuptools \
     ca-certificates \
     zlib1g \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy the GHDL build from the builder stage
 COPY --from=builder /usr/local /usr/local
 
 # Install Cocotb and Coverage tools
-# gcovr is essential for turning gcov data into readable reports
 RUN pip3 install --break-system-packages \
     cocotb \
     cocotb-bus \
@@ -59,12 +56,10 @@ RUN pip3 install --break-system-packages \
     gcovr
 
 # --- Xilinx Library Integration ---
-# Re-using your logic for Vivado vendors
 RUN mkdir -p /usr/local/lib/ghdl/vendors/xilinx-vivado
 COPY ghdl_vendors/xilinx-vivado/ /usr/local/lib/ghdl/vendors/xilinx-vivado/
 RUN chmod -R 755 /usr/local/lib/ghdl/vendors/xilinx-vivado
 
-# Force GHDL to see the new library path
 ENV GHDL_FLAGS="-P/usr/local/lib/ghdl/vendors/xilinx-vivado"
 
 WORKDIR /work
