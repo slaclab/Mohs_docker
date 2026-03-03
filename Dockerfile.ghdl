@@ -45,6 +45,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# For Debian/Ubuntu-based images
+RUN apt-get update && apt-get install -y \
+    libgnat-12 \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY --from=builder /usr/local /usr/local
 
 # Install Cocotb and Coverage tools
