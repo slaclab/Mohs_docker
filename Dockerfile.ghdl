@@ -23,15 +23,12 @@ RUN git clone https://github.com/ghdl/ghdl.git
 # FIX: Use the LLVM backend for reliable coverage on Bookworm
 # It provides identical gcov-style coverage via lcov/gcovr
 WORKDIR /tmp/ghdl
-RUN ./configure --with-llvm-config --prefix=/usr/local
-RUN make -j$(nproc)
-RUN make install
+RUN ./configure --with-llvm-config --prefix=/usr/local --enable-libghdl --enable-vpi
+RUN make -j$(nproc) && RUN make install
 
 # Final Stage
 FROM debian:bookworm
-
 ENV DEBIAN_FRONTEND=noninteractive
-
 RUN apt-get update && apt-get install -y --no-install-recommends \
     llvm \
     libllvm14 \
@@ -42,12 +39,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-dev \
     ca-certificates \
     zlib1g \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
-# For Debian/Ubuntu-based images
-RUN apt-get update && apt-get install -y \
+    lcov \
+    binutils \
     libgnat-12 \
+    ncurses-term \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/local /usr/local
@@ -58,7 +54,11 @@ RUN pip3 install --break-system-packages \
     cocotb-bus \
     cocotb-test \
     pytest \
-    gcovr
+    gcovr \
+    pyyaml \           # Parsing parameter files for ACM logic
+    pandas \           # Analyzing large CORDIC error logs
+    matplotlib \       # Plotting Mag/Phs results to see convergence
+    scipy              # Signal processing verification for Digitizer logic
 
 # --- Xilinx Library Integration ---
 RUN mkdir -p /usr/local/lib/ghdl/vendors/xilinx-vivado
