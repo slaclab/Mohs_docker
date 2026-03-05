@@ -23,8 +23,9 @@ RUN git clone https://github.com/ghdl/ghdl.git
 # FIX: Use the LLVM backend for reliable coverage on Bookworm
 # It provides identical gcov-style coverage via lcov/gcovr
 WORKDIR /tmp/ghdl
-RUN ./configure --with-llvm-config --prefix=/usr/local --enable-libghdl --enable-vpi
-RUN make -j$(nproc) && RUN make install
+RUN ./configure --with-llvm-config --prefix=/usr/local --enable-libghdl
+RUN make -j$(nproc)
+RUN make install
 
 # Final Stage
 FROM debian:bookworm
