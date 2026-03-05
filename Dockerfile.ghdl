@@ -60,7 +60,7 @@ RUN pip3 install --break-system-packages --no-cache-dir \
     pandas \
     matplotlib \
     scipy \
-    && rm -rf /root/.cache/pip && \
+    && rm -rf /root/.cache/pip \
     && rm -rf /tmp/*
 
 # --- Xilinx Library Integration ---
