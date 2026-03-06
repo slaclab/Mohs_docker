@@ -29,15 +29,13 @@ RUN git clone https://github.com/ghdl/ghdl.git /tmp/ghdl
 # 3. Configure GHDL pointing to the GCC source tree
 WORKDIR /tmp/ghdl
 RUN ./configure --with-gcc=/tmp/gcc-12.2.0 --prefix=/usr/local --enable-libghdl
-
-# 3.1. Build the GHDL binary
 RUN make -j$(nproc)
 
-# 3.2. NEW: Build the supporting libraries required for the GCC backend
-RUN make libgnat
-RUN make libs
+# 3.1. Manually build the VHDL libraries using the newly built ghdl
+# We use the 'ghdl' executable just created in the current directory
+RUN make libs.vhdl.gcc GHDL_BIN=./ghdl
 
-# 3.3. Now install everything
+# 3.2. Now install everything
 RUN make install
 
 # Final Stage
