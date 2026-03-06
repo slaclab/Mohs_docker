@@ -20,7 +20,9 @@ WORKDIR /tmp/ghdl
 RUN ./configure --with-gcc=/tmp/gcc-12.2.0 --prefix=/usr/local --enable-libghdl
 RUN make -j$(nproc)
 
-RUN make libs.vhdl.gcc GHDL=./ghdl
+RUN mkdir -p /usr/local/bin && \
+    ln -s $(pwd)/ghdl /usr/local/bin/ghdl
+RUN make libs.vhdl.gcc
 RUN make install
 
 # Final Stage
