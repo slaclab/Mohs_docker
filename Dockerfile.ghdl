@@ -31,11 +31,8 @@ WORKDIR /tmp/ghdl
 RUN ./configure --with-gcc=/tmp/gcc-12.2.0 --prefix=/usr/local --enable-libghdl
 RUN make -j$(nproc)
 
-# 3.1. Manually build the VHDL libraries using the newly built ghdl
-# We use the 'ghdl' executable just created in the current directory
-RUN make libs.vhdl.gcc GHDL_BIN=./ghdl
-
-# 3.2. Now install everything
+RUN make install
+RUN make libs.vhdl.gcc
 RUN make install
 
 # Final Stage
@@ -49,6 +46,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     make \
     python3-pip \
     python3-dev \
+    python3-venv \
     ca-certificates \
     zlib1g \
     lcov \
@@ -62,7 +60,7 @@ COPY --from=builder /usr/local /usr/local
 
 # Install Cocotb and Coverage tools
 RUN pip3 install --break-system-packages --no-cache-dir \
-    vunit \
+    vunit_hdl \
     cocotb \
     cocotb-bus \
     cocotb-test \
@@ -74,11 +72,6 @@ RUN pip3 install --break-system-packages --no-cache-dir \
     scipy \
     && rm -rf /root/.cache/pip \
     && rm -rf /tmp/*
-
-# --- Xilinx Library Integration ---
-RUN mkdir -p /usr/local/lib/ghdl/vendors/xilinx-vivado
-COPY ghdl_vendors/xilinx-vivado/ /usr/local/lib/ghdl/vendors/xilinx-vivado/
-RUN chmod -R 755 /usr/local/lib/ghdl/vendors/xilinx-vivado
 
 ENV GHDL_FLAGS="-P/usr/local/lib/ghdl/vendors/xilinx-vivado"
 
