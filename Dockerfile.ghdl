@@ -1,46 +1,24 @@
-FROM debian:bookworm AS builder
+# 1. Start with the pre-built tool
+FROM ghdl/ghdl:bookworm-gcc
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# 2. Add your specific Python/DSP dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential gnat gcc g++ git make zlib1g-dev \
-    llvm-dev clang python3 ca-certificates wget tar bzip2 \
-    && apt-get clean
+    python3-pip python3-dev python3-venv ca-certificates \
+    zlib1g lcov gcovr binutils ncurses-term \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /tmp
-# 1. Download GCC source matching your installed version (12.2.0)
-RUN wget https://ftpmirror.gnu.org/gcc/gcc-12.2.0/gcc-12.2.0.tar.gz && \
-    tar xf gcc-12.2.0.tar.gz
-
-# 2. NEW: Clone the GHDL source code
-RUN git clone https://github.com/ghdl/ghdl.git /tmp/ghdl
-
-# 3. Configure GHDL pointing to the GCC source tree
-WORKDIR /tmp/ghdl
-RUN ./configure --with-gcc=/tmp/gcc-12.2.0 --prefix=/usr/local --enable-libghdl
-RUN make -j$(nproc)
-
-RUN mkdir -p /usr/local/bin && cp -p ghdl /usr/local/bin/ghdl
-RUN make libs.vhdl.gcc
-RUN make install
-
-# Final Stage
-FROM debian:bookworm
-ENV DEBIAN_FRONTEND=noninteractive
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    llvm libllvm14 gcc g++ make python3-pip python3-dev \
-    python3-venv ca-certificates zlib1g lcov binutils \
-    libgnat-12 ncurses-term \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
-COPY --from=builder /usr/local /usr/local
-
+# 3. Setup Python environment
 RUN pip3 install --break-system-packages --no-cache-dir \
-    vunit_hdl cocotb cocotb-bus cocotb-test pytest gcovr \
-    pyyaml pandas matplotlib scipy \
-    && rm -rf /root/.cache/pip
+    vunit_hdl cocotb cocotb-bus cocotb-test pytest pyyaml \
+    pandas matplotlib scipy
+
+# 4. Bring in your Xilinx libraries
+RUN mkdir -p /usr/local/lib/ghdl/vendors/xilinx-vivado
+COPY ghdl_vendors/xilinx-vivado/ /usr/local/lib/ghdl/vendors/xilinx-vivado/
+RUN chmod -R 755 /usr/local/lib/ghdl/vendors/xilinx-vivado
+
+ENV GHDL_FLAGS="-P/usr/local/lib/ghdl/vendors/xilinx-vivado"
 
 WORKDIR /work
-LABEL org.opencontainers.image.source=https://github.com/slaclab/Mohs_docker
