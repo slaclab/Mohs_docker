@@ -1,17 +1,17 @@
-# 1. Start with the verified official GCC-backend image
-FROM ghdl/ghdl:gcc-debian12
+# 1. Start with the VUnit-GHDL-GCC integrated image (Bookworm based)
+FROM ghdl/vunit:gcc
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# 2. Install only your extra DSP/Verification tools
+# 2. Install your specific Python DSP and SLAC tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-pip python3-dev python3-venv ca-certificates \
     zlib1g lcov gcovr binutils ncurses-term \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# 3. Setup Python stack (Cocotb, VUnit, etc.)
+# 3. Setup Python stack (VUnit is already there, but we add the others)
 RUN pip3 install --break-system-packages --no-cache-dir \
-    vunit_hdl cocotb cocotb-bus cocotb-test pytest pyyaml \
+    cocotb cocotb-bus cocotb-test pytest pyyaml \
     pandas matplotlib scipy
 
 # 4. Integrate your Xilinx libraries
