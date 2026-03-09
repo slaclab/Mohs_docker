@@ -19,9 +19,14 @@ RUN mkdir -p /usr/local/lib/ghdl/vendors/xilinx-vivado
 COPY ghdl_vendors/xilinx-vivado/ /usr/local/lib/ghdl/vendors/xilinx-vivado/
 RUN chmod -R 755 /usr/local/lib/ghdl/vendors/xilinx-vivado
 
-# 5. Help the GHDL-GCC driver find the profiling libraries
-ENV LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:$LIBRARY_PATH"
-ENV CPATH="/usr/include:$CPATH"
+# 5. Enhanced Library Paths for GHDL-GCC
+# We use a wildcard to find the GCC version-specific path dynamically
+RUN GCC_LIB_PATH=$(dirname $(gcc -print-libgcc-file-name)) && \
+    echo "export LIBRARY_PATH=\$LIBRARY_PATH:$GCC_LIB_PATH" >> /etc/bash.bashrc
+
+# Ensure GHDL is using the GCC backend version explicitly
+ENV GHDL_BACKEND=gcc
+ENV LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:/usr/lib/gcc/x86_64-linux-gnu/12:$LIBRARY_PATH"
 ENV GHDL_FLAGS="-P/usr/local/lib/ghdl/vendors/xilinx-vivado"
 
 WORKDIR /work
