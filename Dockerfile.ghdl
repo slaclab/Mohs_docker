@@ -19,6 +19,9 @@ RUN mkdir -p /usr/local/lib/ghdl/vendors/xilinx-vivado
 COPY ghdl_vendors/xilinx-vivado/ /usr/local/lib/ghdl/vendors/xilinx-vivado/
 RUN chmod -R 755 /usr/local/lib/ghdl/vendors/xilinx-vivado
 
+# 5. Help the GHDL-GCC driver find the profiling libraries
+ENV LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:$LIBRARY_PATH"
+ENV CPATH="/usr/include:$CPATH"
 ENV GHDL_FLAGS="-P/usr/local/lib/ghdl/vendors/xilinx-vivado"
 
 WORKDIR /work
