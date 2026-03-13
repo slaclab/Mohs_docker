@@ -1,3 +1,10 @@
+# --- Stage 1: Build vhdl_lang (Rust) ---
+FROM rust:1.75-bookworm AS rust-builder
+WORKDIR /build
+RUN git clone https://github.com/VHDL-LS/rust_hdl.git . && \
+    cargo build --release --bin vhdl_lang
+
+# --- Stage 2: Final GHDL Image ---
 # 1. Start with the VUnit-GHDL-GCC image
 FROM ghdl/vunit:gcc
 
@@ -9,7 +16,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     shellcheck tcl curl git zlib1g lcov gcovr binutils unzip file \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# 2.1. Install VHDL-LS (Rust binaries)
+# 3. Copy vhdl_lang from the builder
+COPY --from=rust-builder /build/target/release/vhdl_lang /usr/local/bin/vhdl_lang
+RUN chmod +x /usr/local/bin/vhdl_lang
+
+# 3.1. Install VHDL-LS (Rust binaries)
 RUN curl -L https://github.com/VHDL-LS/rust_hdl/releases/latest/download/vhdl_ls-x86_64-unknown-linux-musl.zip -o vhdl_ls.zip && \
     unzip vhdl_ls.zip && \
     # Move the binary to the path
@@ -20,7 +31,7 @@ RUN curl -L https://github.com/VHDL-LS/rust_hdl/releases/latest/download/vhdl_ls
     chmod +x /usr/local/bin/vhdl_ls && \
     rm -rf vhdl_ls.zip vhdl_ls-x86_64-unknown-linux-musl
 
-# 2.2 Install Nagelfar (Tcl Linter) - Surgical Fix
+# 4. Install Nagelfar (Tcl Linter) - Surgical Fix
 RUN curl -fL "https://downloads.sourceforge.net/project/nagelfar/Rel_135/nagelfar135.tar.gz" -o nagelfar.tar.gz && \
     tar -xzf nagelfar.tar.gz && \
     # Ensure the target directory exists
@@ -36,33 +47,33 @@ RUN curl -fL "https://downloads.sourceforge.net/project/nagelfar/Rel_135/nagelfa
     chmod +x /usr/local/bin/nagelfar && \
     rm -rf nagelfar.tar.gz nagelfar1.3.5 nagelfar135
 
-# 3. Fix Environment Variable warnings
+# 5. Fix Environment Variable warnings
 ENV LIBRARY_PATH="/usr/lib/x86_64-linux-gnu"
 ENV CPATH="/usr/include"
 ENV GHDL_BACKEND=gcc
 
-# 4. Setup Python stack 
+# 6. Setup Python stack 
 RUN pip3 install --break-system-packages --no-cache-dir \
     cocotb==2.0.1 cocotb-bus cocotb-test pytest pyyaml vunit_hdl \
     pandas matplotlib scipy
 
-# 5. Verify VUnit Installation
+# 7. Verify VUnit Installation
 # FIX: Changed python3.12 to python3 to match Bookworm
 RUN python3 -c "import vunit; print(f'VUnit Version: {vunit.__version__}')"
 
-# 6. Integrate Xilinx libraries
+# 8. Integrate Xilinx libraries
 RUN mkdir -p /usr/local/lib/ghdl/vendors/xilinx-vivado
 COPY ghdl_vendors/xilinx-vivado/ /usr/local/lib/ghdl/vendors/xilinx-vivado/
 
-# 7. Enhanced Library Paths for GHDL-GCC
+# 9. Enhanced Library Paths for GHDL-GCC
 RUN GCC_LIB_PATH=$(dirname $(gcc -print-libgcc-file-name)) && \
     echo "export LIBRARY_PATH=\$LIBRARY_PATH:$GCC_LIB_PATH" >> /etc/bash.bashrc
 
-# 8. Help the GHDL-GCC driver find the profiling libraries
+# 10. Help the GHDL-GCC driver find the profiling libraries
 ENV LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:/usr/local/lib/gcc/x86_64-pc-linux-gnu/12.3.0/:${LIBRARY_PATH}"
 ENV CPATH="/usr/include:${CPATH}"
 
-# 9. Final Environment Settings
+# 11. Final Environment Settings
 ENV GHDL_FLAGS="-P/usr/local/lib/ghdl/vendors/xilinx-vivado"
 
 WORKDIR /work
