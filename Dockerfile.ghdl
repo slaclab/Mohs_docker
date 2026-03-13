@@ -17,8 +17,12 @@ RUN curl -L https://github.com/VHDL-LS/rust_hdl/releases/latest/download/vhdl_ls
     rm -rf vhdl_ls.zip vhdl_ls-x86_64-unknown-linux-musl
 
 # 2.2 Install Nagelfar (Tcl Linter)
-RUN curl -L https://sourceforge.net/projects/nagelfar/files/Nagelfar/Nagelfar%201.3.3/nagelfar133.tar.gz/download -o nagelfar.tar.gz && \
+# Using a direct mirror link to bypass SourceForge's landing page redirection
+RUN curl -L "https://downloads.sourceforge.net/project/nagelfar/Nagelfar/Nagelfar%201.3.3/nagelfar133.tar.gz" -o nagelfar.tar.gz && \
+    file nagelfar.tar.gz | grep "gzip compressed data" && \
     tar -xzf nagelfar.tar.gz && \
+    # Ensure the script uses the system tclsh
+    sed -i '1s|^.*$|#!/usr/bin/tclsh|' nagelfar1.3.3/nagelfar.tcl && \
     mv nagelfar1.3.3/nagelfar.tcl /usr/local/bin/nagelfar && \
     chmod +x /usr/local/bin/nagelfar && \
     rm -rf nagelfar.tar.gz nagelfar1.3.3
