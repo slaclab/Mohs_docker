@@ -16,15 +16,16 @@ RUN curl -L https://github.com/VHDL-LS/rust_hdl/releases/latest/download/vhdl_ls
     mv vhdl_ls-x86_64-unknown-linux-musl/bin/vhdl_ls /usr/local/bin/ && \
     rm -rf vhdl_ls.zip vhdl_ls-x86_64-unknown-linux-musl
 
-# 2.2 Install Nagelfar (Tcl Linter)
-# Using -f (fail) so curl exits if the download is actually a 404/Error page
-RUN curl -fL "https://downloads.sourceforge.net/project/nagelfar/Nagelfar/Nagelfar%201.3.3/nagelfar133.tar.gz" -o nagelfar.tar.gz && \
+# 2.2 Install Nagelfar (Tcl Linter) - Updated to Rel_135
+RUN curl -fL "https://downloads.sourceforge.net/project/nagelfar/Rel_135/nagelfar135.tar.gz" -o nagelfar.tar.gz && \
     tar -xzf nagelfar.tar.gz && \
-    # Ensure the script uses the system tclsh
-    sed -i '1s|^.*$|#!/usr/bin/tclsh|' nagelfar1.3.3/nagelfar.tcl && \
-    mv nagelfar1.3.3/nagelfar.tcl /usr/local/bin/nagelfar && \
+    # The folder inside the 1.3.5 tarball is usually nagelfar1.3.5 or nagelfar135
+    # We use a wildcard to be safe
+    DIR_NAME=$(ls -d nagelfar*) && \
+    sed -i '1s|^.*$|#!/usr/bin/tclsh|' ${DIR_NAME}/nagelfar.tcl && \
+    mv ${DIR_NAME}/nagelfar.tcl /usr/local/bin/nagelfar && \
     chmod +x /usr/local/bin/nagelfar && \
-    rm -rf nagelfar.tar.gz nagelfar1.3.3
+    rm -rf nagelfar.tar.gz ${DIR_NAME}
 
 # 3. Fix Environment Variable warnings
 ENV LIBRARY_PATH="/usr/lib/x86_64-linux-gnu"
