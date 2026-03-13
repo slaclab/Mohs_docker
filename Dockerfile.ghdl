@@ -9,11 +9,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     shellcheck tcl curl git zlib1g lcov gcovr binutils unzip file \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# 2.1. Install vhdl_ls (Rust binary) for CDC & Structural checks
-# FIX: Extract and move from the specific subdirectory created by unzip
+# 2.1. Install VHDL-LS (Rust binaries)
 RUN curl -L https://github.com/VHDL-LS/rust_hdl/releases/latest/download/vhdl_ls-x86_64-unknown-linux-musl.zip -o vhdl_ls.zip && \
     unzip vhdl_ls.zip && \
-    mv vhdl_ls-x86_64-unknown-linux-musl/bin/vhdl_ls /usr/local/bin/ && \
+    # Move the binary to the path
+    mv vhdl_ls-x86_64-unknown-linux-musl/bin/vhdl_ls /usr/local/bin/vhdl_ls && \
+    # Documentation says it looks for libraries here; let's link them
+    mkdir -p /usr/local/lib/rust_hdl && \
+    mv vhdl_ls-x86_64-unknown-linux-musl/vhdl_libraries /usr/local/lib/rust_hdl/ && \
+    chmod +x /usr/local/bin/vhdl_ls && \
     rm -rf vhdl_ls.zip vhdl_ls-x86_64-unknown-linux-musl
 
 # 2.2 Install Nagelfar (Tcl Linter) - Surgical Fix
