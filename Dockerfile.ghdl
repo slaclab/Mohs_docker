@@ -7,12 +7,13 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-pip python3-dev python3-venv ca-certificates \
     zlib1g lcov gcovr binutils ncurses-term \
+    shellcheck tcl curl git \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # 3. Setup Python stack (VUnit is already there, but we add the others)
 RUN pip3 install --break-system-packages --no-cache-dir \
     cocotb cocotb-bus cocotb-test pytest pyyaml \
-    pandas matplotlib scipy
+    pandas matplotlib scipy vhdl-langserver
 
 # 4. Integrate your Xilinx libraries
 RUN mkdir -p /usr/local/lib/ghdl/vendors/xilinx-vivado
