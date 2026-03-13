@@ -16,21 +16,21 @@ RUN curl -L https://github.com/VHDL-LS/rust_hdl/releases/latest/download/vhdl_ls
     mv vhdl_ls-x86_64-unknown-linux-musl/bin/vhdl_ls /usr/local/bin/ && \
     rm -rf vhdl_ls.zip vhdl_ls-x86_64-unknown-linux-musl
 
-# 2.2 Install Nagelfar (Tcl Linter) 
-# Using the specific Rel_135 mirror link to ensure we get the tarball
+# 2.2 Install Nagelfar (Tcl Linter) - Surgical Fix
 RUN curl -fL "https://downloads.sourceforge.net/project/nagelfar/Rel_135/nagelfar135.tar.gz" -o nagelfar.tar.gz && \
     tar -xzf nagelfar.tar.gz && \
-    # The folder inside is likely 'nagelfar1.3.5' or 'nagelfar135'
-    # We use a wildcard to find the directory and the main tcl file
-    DIR_NAME=$(ls -d nagelfar*) && \
-    # Apply shebang fix so it calls the system tclsh
-    sed -i '1s|^.*$|#!/usr/bin/tclsh|' ${DIR_NAME}/nagelfar.tcl && \
-    # Move the main executable to the path
-    mv ${DIR_NAME}/nagelfar.tcl /usr/local/bin/nagelfar && \
-    # Move the syntax database files if they exist (Nagelfar needs these to be smart)
-    cp ${DIR_NAME}/*.syntax /usr/local/bin/ 2>/dev/null || true && \
+    # Ensure the target directory exists
+    mkdir -p /usr/local/bin && \
+    # Use a simpler approach to find the file and move it
+    NAG_FILE=$(find . -name "nagelfar.tcl") && \
+    # Apply shebang fix
+    sed -i '1s|^.*$|#!/usr/bin/tclsh|' "$NAG_FILE" && \
+    # Explicitly move to the filename nagelfar
+    cp "$NAG_FILE" /usr/local/bin/nagelfar && \
+    # Move syntax files to the same directory so Nagelfar finds them
+    find . -name "*.syntax" -exec cp {} /usr/local/bin/ \; && \
     chmod +x /usr/local/bin/nagelfar && \
-    rm -rf nagelfar.tar.gz ${DIR_NAME}
+    rm -rf nagelfar.tar.gz nagelfar1.3.5 nagelfar135
 
 # 3. Fix Environment Variable warnings
 ENV LIBRARY_PATH="/usr/lib/x86_64-linux-gnu"
