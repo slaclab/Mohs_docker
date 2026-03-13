@@ -10,33 +10,31 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # 2.1. Install vhdl_ls (Rust binary) for CDC & Structural checks
-# We download the latest stable release directly
+# FIX: Extract and move from the specific subdirectory created by unzip
 RUN curl -L https://github.com/VHDL-LS/rust_hdl/releases/latest/download/vhdl_ls-x86_64-unknown-linux-musl.zip -o vhdl_ls.zip && \
     unzip vhdl_ls.zip && \
-    mv vhdl_ls /usr/local/bin/ && \
-    rm vhdl_ls.zip
+    mv vhdl_ls-x86_64-unknown-linux-musl/bin/vhdl_ls /usr/local/bin/ && \
+    rm -rf vhdl_ls.zip vhdl_ls-x86_64-unknown-linux-musl
 
-# 3. Fix Environment Variable warnings (initialize them)
+# 3. Fix Environment Variable warnings
 ENV LIBRARY_PATH="/usr/lib/x86_64-linux-gnu"
 ENV CPATH="/usr/include"
 ENV GHDL_BACKEND=gcc
 
 # 4. Setup Python stack 
-# FIX: We install vhdl_langserver separately to prevent it from blocking 
-# the scientific stack if there's a version metadata conflict.
 RUN pip3 install --break-system-packages --no-cache-dir \
     cocotb==2.0.1 cocotb-bus cocotb-test pytest pyyaml vunit_hdl \
     pandas matplotlib scipy
 
 # 5. Verify VUnit Installation
-RUN python3.12 -c "import vunit; print(f'VUnit Version: {vunit.__version__}')"
+# FIX: Changed python3.12 to python3 to match Bookworm
+RUN python3 -c "import vunit; print(f'VUnit Version: {vunit.__version__}')"
 
 # 6. Integrate Xilinx libraries
 RUN mkdir -p /usr/local/lib/ghdl/vendors/xilinx-vivado
 COPY ghdl_vendors/xilinx-vivado/ /usr/local/lib/ghdl/vendors/xilinx-vivado/
 
 # 7. Enhanced Library Paths for GHDL-GCC
-# We use a wildcard to find the GCC version-specific path dynamically
 RUN GCC_LIB_PATH=$(dirname $(gcc -print-libgcc-file-name)) && \
     echo "export LIBRARY_PATH=\$LIBRARY_PATH:$GCC_LIB_PATH" >> /etc/bash.bashrc
 
