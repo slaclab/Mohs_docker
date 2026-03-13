@@ -3,10 +3,10 @@ FROM ghdl/vunit:gcc
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# 2. Install standard system tools and Python 3.11
+# 2. Add 'file' to the system tools to support the check
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 python3-pip python3-dev python3-venv \
-    shellcheck tcl curl git zlib1g lcov gcovr binutils unzip \
+    shellcheck tcl curl git zlib1g lcov gcovr binutils unzip file \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # 2.1. Install vhdl_ls (Rust binary) for CDC & Structural checks
@@ -17,9 +17,8 @@ RUN curl -L https://github.com/VHDL-LS/rust_hdl/releases/latest/download/vhdl_ls
     rm -rf vhdl_ls.zip vhdl_ls-x86_64-unknown-linux-musl
 
 # 2.2 Install Nagelfar (Tcl Linter)
-# Using a direct mirror link to bypass SourceForge's landing page redirection
-RUN curl -L "https://downloads.sourceforge.net/project/nagelfar/Nagelfar/Nagelfar%201.3.3/nagelfar133.tar.gz" -o nagelfar.tar.gz && \
-    file nagelfar.tar.gz | grep "gzip compressed data" && \
+# Using -f (fail) so curl exits if the download is actually a 404/Error page
+RUN curl -fL "https://downloads.sourceforge.net/project/nagelfar/Nagelfar/Nagelfar%201.3.3/nagelfar133.tar.gz" -o nagelfar.tar.gz && \
     tar -xzf nagelfar.tar.gz && \
     # Ensure the script uses the system tclsh
     sed -i '1s|^.*$|#!/usr/bin/tclsh|' nagelfar1.3.3/nagelfar.tcl && \
