@@ -3,12 +3,18 @@ FROM ghdl/vunit:gcc
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# 2. Install System Tools and standard Python 3 packages
-# Bookworm uses 3.11, which is perfectly fine for Cocotb 2.0.1
+# 2. Install standard system tools and Python 3.11
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 python3-pip python3-dev python3-venv \
-    shellcheck tcl curl git zlib1g lcov gcovr binutils \
+    shellcheck tcl curl git zlib1g lcov gcovr binutils unzip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# 2.1. Install vhdl_ls (Rust binary) for CDC & Structural checks
+# We download the latest stable release directly
+RUN curl -L https://github.com/VHDL-LS/rust_hdl/releases/latest/download/vhdl_ls-x86_64-unknown-linux-musl.zip -o vhdl_ls.zip && \
+    unzip vhdl_ls.zip && \
+    mv vhdl_ls /usr/local/bin/ && \
+    rm vhdl_ls.zip
 
 # 3. Fix Environment Variable warnings (initialize them)
 ENV LIBRARY_PATH="/usr/lib/x86_64-linux-gnu"
@@ -19,14 +25,8 @@ ENV GHDL_BACKEND=gcc
 # FIX: We install vhdl_langserver separately to prevent it from blocking 
 # the scientific stack if there's a version metadata conflict.
 RUN pip3 install --break-system-packages --no-cache-dir \
-    cocotb==2.0.1 cocotb-bus cocotb-test pytest pyyaml vunit_hdl
-
-RUN pip3 install --break-system-packages --no-cache-dir \
+    cocotb==2.0.1 cocotb-bus cocotb-test pytest pyyaml vunit_hdl \
     pandas matplotlib scipy
-
-# Use the alternative name if 'vhdl-langserver' is being difficult on PyPI
-RUN pip3 install --break-system-packages --no-cache-dir vhdl-langserver || \
-    pip3 install --break-system-packages --no-cache-dir vhdl-ls
 
 # 5. Verify VUnit Installation
 RUN python3.12 -c "import vunit; print(f'VUnit Version: {vunit.__version__}')"
@@ -44,7 +44,7 @@ RUN GCC_LIB_PATH=$(dirname $(gcc -print-libgcc-file-name)) && \
 ENV LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:/usr/local/lib/gcc/x86_64-pc-linux-gnu/12.3.0/:${LIBRARY_PATH}"
 ENV CPATH="/usr/include:${CPATH}"
 
-# 9. Final Environment Polish
+# 9. Final Environment Settings
 ENV GHDL_FLAGS="-P/usr/local/lib/ghdl/vendors/xilinx-vivado"
 
 WORKDIR /work
