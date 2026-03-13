@@ -3,23 +3,30 @@ FROM ghdl/vunit:gcc
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# 2. Install Python 3.12 and System Linters
+# 2. Install System Tools and standard Python 3 packages
+# Bookworm uses 3.11, which is perfectly fine for Cocotb 2.0.1
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    software-properties-common \
-    && apt-get update && apt-get install -y --no-install-recommends \
-    python3.12 python3.12-dev python3.12-venv python3-pip \
+    python3 python3-pip python3-dev python3-venv \
     shellcheck tcl curl git zlib1g lcov gcovr binutils \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# 3. Fix the "UndefinedVar" errors by initializing variables if they don't exist
+# 3. Fix Environment Variable warnings (initialize them)
 ENV LIBRARY_PATH="/usr/lib/x86_64-linux-gnu"
 ENV CPATH="/usr/include"
+ENV GHDL_BACKEND=gcc
 
 # 4. Setup Python stack 
-# We use 'vhdl-langserver' but if it fails again, 'rust_hdl' is the alternative
-RUN python3.12 -m pip install --break-system-packages --no-cache-dir \
-    cocotb==2.0.1 cocotb-bus cocotb-test pytest pyyaml \
-    pandas matplotlib scipy vhdl-langserver vunit_hdl
+# FIX: We install vhdl_langserver separately to prevent it from blocking 
+# the scientific stack if there's a version metadata conflict.
+RUN pip3 install --break-system-packages --no-cache-dir \
+    cocotb==2.0.1 cocotb-bus cocotb-test pytest pyyaml vunit_hdl
+
+RUN pip3 install --break-system-packages --no-cache-dir \
+    pandas matplotlib scipy
+
+# Use the alternative name if 'vhdl-langserver' is being difficult on PyPI
+RUN pip3 install --break-system-packages --no-cache-dir vhdl-langserver || \
+    pip3 install --break-system-packages --no-cache-dir vhdl-ls
 
 # 5. Verify VUnit Installation
 RUN python3.12 -c "import vunit; print(f'VUnit Version: {vunit.__version__}')"
@@ -39,9 +46,6 @@ ENV CPATH="/usr/include:${CPATH}"
 
 # 9. Final Environment Polish
 ENV GHDL_FLAGS="-P/usr/local/lib/ghdl/vendors/xilinx-vivado"
-ENV GHDL_BACKEND=gcc
-# Point python to 3.12 specifically
-RUN ln -sf /usr/bin/python3.12 /usr/bin/python3
 
 WORKDIR /work
 LABEL org.opencontainers.image.source=https://github.com/slaclab/Mohs_docker
